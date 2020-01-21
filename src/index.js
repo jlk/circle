@@ -1,10 +1,10 @@
-import "./styles.css";
-
 var canvas;
 var ctx;
 var width;
 var height;
 var pointSize = 1;
+var lookupResolution = 0.01;
+var DEBUG = false;
 
 drawCircle(100);
 
@@ -12,27 +12,37 @@ function drawCircle(radius) {
   // allocate array?
   // build sqRoot lookup array
   var sqRoot = {};
-  var x = 0;
-  while (x < radius * radius) {
-    sqRoot[x * x] = x;
-    x = x + 0.1;
+  var x = 0.0;
+  var radiusSq = radius * radius;
+  while (x < radius) {
+    // Using Number.parseFloat().toFixed() to work around javascript's fp weakness.
+    var xSquared = Number.parseFloat(x * x).toFixed(2);
+    if (DEBUG === true) {
+      console.log("sqRoot[" + xSquared + "] = " + x);
+    }
+    sqRoot[xSquared] = x;
+    x = x + lookupResolution;
   }
 
-  // iterate from 0 to radius
-  // calculate y
   x = 0;
   initGraphics();
+
   var y = 0;
   while (x < radius) {
-    x = x + 0.1;
-    y = sqRoot(radius * radius - x * x);
+    var ySquared = Number.parseFloat(radiusSq - x * x).toFixed(2);
+    // var ySquared = radiusSq - x * x;
+    y = sqRoot[ySquared];
+    if (DEBUG === true) {
+      console.log("looking for sqRoot[" + ySquared + ": " + y);
+    }
     // optimization - refine x increment based on diff in y
-    PlotPixel(x, y);
-    console.log("points: " + x + ", " + y);
-    // PlotPixel(-1 * x, y);
-    // PlotPixel(-1 * x, -1 * y);
-    // PlotPixel(x, -1 * y);
+    PlotPixel(width / 2 + x, height / 2 + y);
+    PlotPixel(width / 2 - x, height / 2 + y);
+    PlotPixel(width / 2 - x, height / 2 - y);
+    PlotPixel(width / 2 + x, height / 2 - y);
+    x = x + 0.1;
   }
+  console.log("done.");
 }
 
 // initGraphics and PlotPixel based on https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics

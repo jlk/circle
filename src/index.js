@@ -3,10 +3,10 @@ var ctx;
 var width;
 var height;
 var pointSize = 1;
-var lookupResolution = 0.01;
+var lookupResolution = 0.001;
 var DEBUG = false;
 
-drawCircle(100);
+drawCircle(200);
 
 function drawCircle(radius) {
   // allocate array?
@@ -14,6 +14,8 @@ function drawCircle(radius) {
   var sqRoot = {};
   var x = 0.0;
   var radiusSq = radius * radius;
+  var t0 = performance.now();
+
   while (x < radius) {
     // Using Number.parseFloat().toFixed() to work around javascript's fp weakness.
     var xSquared = Number.parseFloat(x * x).toFixed(2);
@@ -23,15 +25,23 @@ function drawCircle(radius) {
     sqRoot[xSquared] = x;
     x = x + lookupResolution;
   }
+  var t1 = performance.now();
 
   x = 0;
   initGraphics();
+  ctx.fillStyle = "rgb(30, 30, 30)";
+  PlotAxis();
+  ctx.fillStyle = "rgb(255, 30, 30)";
 
   var y = 0;
+  var misses = 0;
   while (x < radius) {
     var ySquared = Number.parseFloat(radiusSq - x * x).toFixed(2);
     // var ySquared = radiusSq - x * x;
     y = sqRoot[ySquared];
+    if (y === undefined) {
+      misses++;
+    }
     if (DEBUG === true) {
       console.log("looking for sqRoot[" + ySquared + ": " + y);
     }
@@ -42,7 +52,11 @@ function drawCircle(radius) {
     PlotPixel(width / 2 + x, height / 2 - y);
     x = x + 0.1;
   }
+  var t2 = performance.now();
   console.log("done.");
+  console.log("Buidling lookup table: " + (t1 - t0) + "ms");
+  console.log("Rendering circle: " + (t2 - t1) + "ms");
+  console.log("Lookup misses: " + misses);
 }
 
 // initGraphics and PlotPixel based on https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics
@@ -56,8 +70,22 @@ function initGraphics() {
 }
 
 function PlotPixel(x, y) {
-  ctx.fillStyle = "rgb(255, 0, 0)";
   ctx.beginPath();
   ctx.arc(x, y, pointSize, 0, 2 * Math.PI);
   ctx.fill();
+}
+
+function PlotAxis() {
+  var x = 0;
+  var y = height / 2;
+  while (x < width) {
+    PlotPixel(x, y);
+    x++;
+  }
+  x = width / 2;
+  y = 0;
+  while (y < height) {
+    PlotPixel(x, y);
+    y++;
+  }
 }

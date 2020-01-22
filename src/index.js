@@ -3,7 +3,7 @@ var ctx;
 var width;
 var height;
 var pointSize = 1;
-var lookupResolution = 0.001;
+var lookupResolution = 1;
 var DEBUG = false;
 
 drawCircle(200);
@@ -34,13 +34,17 @@ function drawCircle(radius) {
   ctx.fillStyle = "rgb(255, 30, 30)";
 
   var y = 0;
-  var misses = 0;
+  var lookupMisses = 0;
+  var lookupHits = 0;
+
   while (x < radius) {
     var ySquared = Number.parseFloat(radiusSq - x * x).toFixed(2);
     // var ySquared = radiusSq - x * x;
     y = sqRoot[ySquared];
     if (y === undefined) {
-      misses++;
+      lookupMisses++;
+    } else {
+      lookupHits++;
     }
     if (DEBUG === true) {
       console.log("looking for sqRoot[" + ySquared + ": " + y);
@@ -50,13 +54,15 @@ function drawCircle(radius) {
     PlotPixel(width / 2 - x, height / 2 + y);
     PlotPixel(width / 2 - x, height / 2 - y);
     PlotPixel(width / 2 + x, height / 2 - y);
+
     x = x + 0.1;
   }
   var t2 = performance.now();
   console.log("done.");
   console.log("Buidling lookup table: " + (t1 - t0) + "ms");
   console.log("Rendering circle: " + (t2 - t1) + "ms");
-  console.log("Lookup misses: " + misses);
+  console.log("Lookup hits: " + lookupHits);
+  console.log("Lookup misses: " + lookupMisses);
 }
 
 // initGraphics and PlotPixel based on https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics

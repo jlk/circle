@@ -35,7 +35,9 @@ function drawCircle(radius) {
   ctx.fillStyle = "rgb(255, 30, 30)";
 
   var y = 0;
-  var misses = 0;
+  var lookupMisses = 0;
+  var lookupHits = 0;
+
   while (x < radius) {
     var ySquared = Number.parseFloat(radiusSq - x * x);
     t0 = performance.now();

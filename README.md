@@ -5,3 +5,6 @@ I was asked recently how one draws a circle without using math functions such as
 The code from this project can be seen and executed in Code Sandbox at https://codesandbox.io/s/github/jlk/circle.
 
 The original algorithm did work, but the problem I ran into was JavaScript does fishy things with floating point numbers. To work around this, I'm fixing lookup keys to 2 decimal places using `Number.parseFloat(x).toFixed(2)`. I don't find this elegant, so as I get a bit of time to tinker some more I'll probably iterate on this further.
+
+### Update 2/26 - 
+So, toFixed(2) converts to string. Figuring that out burned a good bit of time, trying to understand why (100 > 99.99) wasn't evaluating to true. Also added code to recursively approximate square root values - it works more efficiently than I expected.

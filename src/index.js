@@ -36,7 +36,6 @@ function drawCircle(radius) {
 
   var y = 0;
   var lookupMisses = 0;
-  var lookupHits = 0;
 
   while (x < radius) {
     var ySquared = Number.parseFloat(radiusSq - x * x);
@@ -46,7 +45,7 @@ function drawCircle(radius) {
     sqRootTime = sqRootTime + (t1 - t0);
 
     if (y === undefined) {
-      misses++;
+      lookupMisses++;
     } else {
       // optimization - refine x increment based on diff in y
       t0 = performance.now();
@@ -63,7 +62,7 @@ function drawCircle(radius) {
   console.log("done.");
   console.log("Square root calculation: " + sqRootTime + "ms");
   console.log("Rendering circle: " + renderingTime + "ms");
-  console.log("Lookup misses: " + misses);
+  console.log("Lookup misses: " + lookupMisses);
   console.log("Calls to squareRoot(): " + sqrootCounts);
   console.log("Calls to calcRoot(): " + calcCounts);
 }
